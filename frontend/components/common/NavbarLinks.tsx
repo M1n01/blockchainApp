@@ -1,5 +1,5 @@
 import { NavLink } from "@mantine/core";
-import { IconHome2 } from "@tabler/icons-react";
+import { IconHome2, IconCards } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -11,6 +11,12 @@ export const NavbarLinks = () => {
       color: "green",
       label: "Home",
       path: "/"
+    },
+    {
+      icon: <IconCards size={20} />,
+      color: "green",
+      label: "My NFT",
+      path: "/mynft"
     }
   ];
 
