@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import fs from "fs";
 
 async function main() {
   const myToken = await ethers.deployContract("MyToken");
@@ -12,8 +13,15 @@ async function main() {
   //NFT Contractをデプロイする
   const myERC721 = await ethers.deployContract("MyERC721", ["MyERC721", "MYERC721"]);
   await myERC721.waitForDeployment();
-
   console.log(`MyERC721 deployed to: ${myERC721.target}`);
+
+  const addresses = {
+    myToken: await myToken.getAddress(),
+    myERC20: await myERC20.getAddress(),
+    myERC721: await myERC721.getAddress(),
+  };
+
+  fs.writeFileSync("addresses.json", JSON.stringify(addresses, null, 2));
 }
 
 // We recommend this pattern to be able to use async/await everywhere
