@@ -50,6 +50,7 @@ npx hardhat compile
 npx hardhat node
 
 // 別ターミナルで
+npm run deploy
 npm run dev
 
 // ブラウザで http://localhost:3000 にアクセス
