@@ -8,8 +8,10 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 // 所有者ごとのtokenIdを返却する機能を提供する
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+// ロイヤリティ情報の機能を提供する
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
-contract MyERC721 is ERC721URIStorage, ERC721Enumerable, AccessControl {
+contract MyERC721 is ERC721URIStorage, ERC721Enumerable, AccessControl, ERC2981 {
 	// @dev tokenIdを自動インクリメントするためのカウンター, default: 0
 	uint256 private _tokenIdCounter;
 
@@ -71,7 +73,7 @@ contract MyERC721 is ERC721URIStorage, ERC721Enumerable, AccessControl {
 	}
 
 	// ERC-165で定義されている、スマートコントラクトが特定のインターフェースをサポートしているかを確認するための関数
-	function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl, ERC721Enumerable, ERC721URIStorage) returns (bool) {
+	function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl, ERC721Enumerable, ERC721URIStorage, ERC2981) returns (bool) {
 		return super.supportsInterface(interfaceId);
 	}
 }
