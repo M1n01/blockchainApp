@@ -189,6 +189,14 @@ export default function MyNFT() {
       // executeAllActionsの返り値で返却されるorderは、NFT売却者(offerer)が署名した売り注文データとなっている
       const order = await orderUseCase.executeAllActions();
       console.log(order); // For Debug
+      // 作成した売り注文公開APIを実行する
+      await fetch('/api/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(order)
+      });
       // 注文が成功したら、アラートを表示
       setShowAlert(true);
       setAlertMessage(`NFT (${sellTargetTokenId}) is now on sale!`);
