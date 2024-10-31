@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint frontend/**/*.{tsx,ts} test/**/*.{tsx,ts} scripts/**/*.{tsx,ts}",
+    "lint:fix": "eslint --fix 'frontend/**/*.{ts,tsx}' 'test/**/*.{ts,tsx}' 'scripts/**/*.{ts,tsx}'",
     "deploy": "hardhat run scripts/deploy-local.ts --network localhost",
-    "dev": "cd frontend && npm run dev"
+    "dev": "cd frontend && npm run dev",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -14,10 +17,27 @@
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "hardhat": "^2.18.2"
   },
+  "lint-staged": {
+    "frontend/**/*.{tsx,ts},test/**/*.{tsx,ts},scripts/**/*.{tsx,ts}": [
+      "prettier --write --log-level=error",
+      "eslint --fix --quiet"
+    ],
+    "contracts/**/*.sol": [
+      "prettier --write --plugin=prettier-plugin-solidity --log-level=error",
+      "solhint"
+    ]
+  },
   "dependencies": {
     "@opensea/seaport-js": "^2.0.7",
     "@openzeppelin/contracts": "^4.9.3",
+    "@typescript-eslint/eslint-plugin": "^8.12.2",
+    "@typescript-eslint/parser": "^8.12.2",
+    "eslint": "^9.13.0",
     "ethersV5": "npm:ethers@^5.7.2",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "prettier-plugin-solidity": "^1.4.1",
     "seaport": "github:ProjectOpenSea/seaport#1.5"
   }
 }
