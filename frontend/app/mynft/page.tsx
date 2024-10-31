@@ -3,9 +3,14 @@ import { ethers, isError } from 'ethers';
 import { useContext, useEffect, useRef, useState } from 'react';
 import artifact from '../../abi/MyERC721.sol/MyERC721.json';
 import { Web3SignerContext } from '@/context/web3.context';
-import { Alert, Avatar, Button, Card, Container, Group, SimpleGrid, Stack, Text, TextInput, Title, Image, Badge } from '@mantine/core';
+import { Alert, Avatar, Button, Card, Container, Group, SimpleGrid, Stack, Text, TextInput, Title, Image, Badge, Modal } from '@mantine/core';
 import { IconCubePlus } from '@tabler/icons-react';
 import { MyERC721, MyERC721__factory } from '@/types';
+import { useDisclosure } from '@mantine/hooks';
+import { ethers as ethersV5 } from 'ethersV5';
+import { Seaport } from '@opensea/seaport-js';
+import { ItemType } from '@opensea/seaport-js/lib/constants';
+import { CreateOrderInput } from '@opensea/seaport-js/lib/types';
 import addresses from '../../../addresses.json';
 
 // デプロイしたMyERC721 Contractのアドレスを入力
@@ -108,6 +113,92 @@ export default function MyNFT() {
     fetchNFTs();
   }, [myERC721Contract, signer]);
 
+  // NFT売り注文作成
+
+  // Seaport Contractのaddress
+  const seaportAddress = addresses.seaport;
+
+  // Seaportのインスタンスを保持するstate
+  const [seaport, setSeaport] = useState<Seaport | null>(null);
+
+  // Seaportインスタンスを作成して保持
+  useEffect(() => {
+    // インスタンスを初期化
+    const setupSeaport = async () => {
+      if (signer) {
+        // NOTICE: seaport-jsはethersV6をサポートしていないため、ethersV5のprovider/signerを利用
+        const { ethereum } = window as any;
+        const ethersV5Provider = new ethersV5.providers.Web3Provider(ethereum);
+        const ethersV5Signer = ethersV5Provider.getSigner();
+        // ローカルにデプロイしたSeaport Contractのアドレスを指定
+        const localSeaport = new Seaport(ethersV5Signer, {
+          overrides: {
+            contractAddress: seaportAddress
+          }
+        });
+        setSeaport(localSeaport);
+      }
+    };
+    setupSeaport();
+  }, [signer]);
+
+  // 売り注文作成モーダルの表示コントロール
+  const [opened, { open, close }] = useDisclosure(false);
+  // NFT売却における価格データを保持
+  const refSellOrder = useRef<HTMLInputElement>(null);
+  // NFT作成中のローディング
+  const [loadingSellOrder, setLoadingSellOrder] = useState(false);
+  // 売りに出すNFTのtokenIdを保持
+  const [ sellTargetTokenId, setSellTargetTokenId ] = useState<string | null>(null);
+
+  // モーダルのオープン
+  const openModal = (tokenId: string) => {
+    setSellTargetTokenId(tokenId);
+    open();
+  };
+
+  // NFT売り注文作成処理
+  const createSellOrder = async () => {
+    try {
+      setLoadingSellOrder(true);
+      // フォームに入力した価格の取得
+      const price = refSellOrder.current!.value;
+      // 売り注文作成のための入力データを作成
+      const firstStandardCreateOrderInput = {
+        offer: [
+          {
+            itemType: ItemType.ERC721,
+            token: contractAddress,
+            identifier: sellTargetTokenId,
+          }
+        ], // 上記はMyERC721を売りに出していることを示している
+        consideration: [
+          {
+            amount: ethers.parseUnits(price, 'ether').toString(),
+            recipient: await signer?.getAddress()!,
+            token: ethers.ZeroAddress,
+          }
+          // 上記は売りに出したNFTの売価と受取人を指定している
+        ],
+        // 下記のように手数料やロイヤリティを指定することもできる
+        // fees: [{ recipient: signer._address, basisPoints: 500 }]
+      } as CreateOrderInput;
+      const orderUseCase = await seaport!.createOrder(
+        firstStandardCreateOrderInput
+      );
+      // executeAllActionsの返り値で返却されるorderは、NFT売却者(offerer)が署名した売り注文データとなっている
+      const order = await orderUseCase.executeAllActions();
+      console.log(order); // For Debug
+      // 注文が成功したら、アラートを表示
+      setShowAlert(true);
+      setAlertMessage(`NFT (${sellTargetTokenId}) is now on sale!`);
+    } finally {
+      setLoadingSellOrder(false);
+      setSellTargetTokenId(null);
+      close();
+    }
+  }
+
   return (
     <div>
       <Title order={1} style={{ paddingBottom: 12 }}>My NFT Management</Title>
@@ -160,10 +251,19 @@ export default function MyNFT() {
                 </Badge>
               </Group>
               <Text size='sm' c='dimmed'>{nft.description}</Text>
+              <Button variant='light' color='blue' fullWidth mt='md' radius='md' onClick={() => openModal(nft.tokenId.toString())}>
+                Sell NFT
+              </Button>
             </Card>
           ))
         }
       </SimpleGrid>
+      <Modal opened={opened} onClose={close} title="Sell your NFT">
+        <Stack>
+          <TextInput ref={refSellOrder} label='Price (ether)' placeholder='10' />
+          <Button loading={loadingSellOrder} onClick={createSellOrder}>Create Sell Order</Button>
+        </Stack>
+      </Modal>
     </div>
   );
 }
