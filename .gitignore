@@ -8,8 +8,7 @@ typechain-types
 # Hardhat files
 cache
 artifacts
-
-memo
+frontend/types
 
 .vscode/*
 

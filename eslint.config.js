@@ -4,8 +4,8 @@ import globals from 'globals';
 export default [
   eslint.configs.recommended,
   {
-    files: ['frontend/**/*.{ts,tsx}', 'test/**/*.{ts,tsx}'],
-    ignores: ['node_modules', 'frontend/node_modules'],
+    files: ['frontend//*.{ts,tsx}'],
+    ignores: ['frontend/node_modules', 'frontend/types'],
     languageOptions: {
       globals: {
         ...globals.browser,

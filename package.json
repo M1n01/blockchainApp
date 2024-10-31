@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint frontend/**/*.{tsx,ts} test/**/*.{tsx,ts} scripts/**/*.{tsx,ts}",
-    "lint:fix": "eslint --fix 'frontend/**/*.{ts,tsx}' 'test/**/*.{ts,tsx}' 'scripts/**/*.{ts,tsx}'",
+    "lint": "eslint frontend/**/*.{tsx,ts}",
+    "lint:fix": "eslint --fix 'frontend/**/*.{ts,tsx}'",
     "deploy": "hardhat run scripts/deploy-local.ts --network localhost",
     "dev": "cd frontend && npm run dev",
     "prepare": "husky"
@@ -18,7 +18,7 @@
     "hardhat": "^2.18.2"
   },
   "lint-staged": {
-    "frontend/**/*.{tsx,ts},test/**/*.{tsx,ts},scripts/**/*.{tsx,ts}": [
+    "frontend/**/*.{tsx,ts}": [
       "prettier --write --log-level=error",
       "eslint --fix --quiet"
     ],
@@ -38,6 +38,7 @@
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "prettier-plugin-solidity": "^1.4.1",
-    "seaport": "github:ProjectOpenSea/seaport#1.5"
+    "seaport": "github:ProjectOpenSea/seaport#1.5",
+    "solhint": "^5.0.3"
   }
 }
