@@ -78,7 +78,7 @@ contract MyERC20 is ERC20, Ownable, ERC20Permit, ERC20Votes, AccessControl {
    * この関数はオーナーのみが実行できる
    * @param minterAddress MINTER_ROLEを付与するアドレス
    */
-  function addMinter(address minterAddress) public onlyOwner {
+  function grantMinterRole(address minterAddress) public onlyOwner {
     _grantRole(MINTER_ROLE, minterAddress);
   }
 
