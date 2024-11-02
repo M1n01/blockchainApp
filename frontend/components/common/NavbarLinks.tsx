@@ -1,29 +1,35 @@
-import { NavLink } from "@mantine/core";
-import { IconHome2, IconCards, IconShoppingCart, IconShoppingCartBolt } from "@tabler/icons-react";
-import Link from "next/link";
-import { useState } from "react";
+import { NavLink } from '@mantine/core';
+import { IconHome2, IconCards, IconShoppingCartBolt, IconBulb } from '@tabler/icons-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export const NavbarLinks = () => {
   // ナビゲーションメニューに表示するリンク
   const links = [
     {
       icon: <IconHome2 size={20} />,
-      color: "green",
-      label: "Home",
-      path: "/"
+      color: 'green',
+      label: 'Home',
+      path: '/',
     },
     {
       icon: <IconCards size={20} />,
-      color: "green",
-      label: "My NFT",
-      path: "/mynft"
+      color: 'green',
+      label: 'My NFT',
+      path: '/mynft',
     },
     {
       icon: <IconShoppingCartBolt size={20} />,
-      color: "green",
-      label: "Buy NFT",
-      path: "/order"
-    }
+      color: 'green',
+      label: 'Buy NFT',
+      path: '/order',
+    },
+    {
+      icon: <IconBulb size={20} />,
+      color: 'green',
+      label: 'My Governor',
+      path: '/mygovernor',
+    },
   ];
 
   const [active, setActive] = useState(0);
@@ -38,10 +44,6 @@ export const NavbarLinks = () => {
       leftSection={item.icon}
       onClick={() => setActive(index)}
     />
-  ))
-  return (
-    <div>
-      {linkElements}
-    </div>
-  );
+  ));
+  return <div>{linkElements}</div>;
 };
