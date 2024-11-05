@@ -1,16 +1,17 @@
-"use client"
-import { ethers } from "ethers";
-import { useEffect, useState } from "react";
-import artifact from "../abi/MyToken.sol/MyToken.json";
+'use client';
+import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
+import artifact from '../abi/MyToken.sol/MyToken.json';
+import addresses from '../../addresses.json';
 
 // デプロイしたMyTokenのアドレス
-const contractAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+const contractAddress = addresses.myToken ?? null;
 
 export default function Home() {
   // MetaMaskなどが提供するイーサリアムプロバイダーを格納する変数
   const [windowEthereum, setWindowEthereum] = useState();
   // MyTokenの所有数を格納する変数
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     // イーサリアムプロバイダーを取得し、変数に代入
@@ -26,13 +27,9 @@ export default function Home() {
       // 署名オブジェクトの取得
       const signer = await provider.getSigner();
       // コントラクトの取得
-      const contract = new ethers.Contract(
-        contractAddress,
-        artifact.abi,
-        provider
-      );
+      const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
       // ウォレットアドレスの取得
-      const walletAddress : string = await signer.getAddress();
+      const walletAddress: string = await signer.getAddress();
       // MyTokenコントラクトから指定したウォレットアドレスのトークン所有数を取得
       const balance = await contract.balanceOf(walletAddress);
       // BigIntリテラル付きで所有数が返されるのでテキストに変換して代入
