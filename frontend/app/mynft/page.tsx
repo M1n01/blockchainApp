@@ -1,9 +1,24 @@
-'use client'
+'use client';
 import { ethers, isError } from 'ethers';
 import { useContext, useEffect, useRef, useState } from 'react';
 import artifact from '../../abi/MyERC721.sol/MyERC721.json';
 import { Web3SignerContext } from '@/context/web3.context';
-import { Alert, Avatar, Button, Card, Container, Group, SimpleGrid, Stack, Text, TextInput, Title, Image, Badge, Modal } from '@mantine/core';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Card,
+  Container,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+  Image,
+  Badge,
+  Modal,
+} from '@mantine/core';
 import { IconCubePlus } from '@tabler/icons-react';
 import { MyERC721, MyERC721__factory } from '@/types';
 import { useDisclosure } from '@mantine/hooks';
@@ -17,10 +32,10 @@ import addresses from '../../../addresses.json';
 const contractAddress = addresses.myERC721;
 
 type NFT = {
-  tokenId: bigint,
-  name: string,
-  description: string,
-  image: string,
+  tokenId: bigint;
+  name: string;
+  description: string;
+  image: string;
 };
 
 export default function MyNFT() {
@@ -44,7 +59,7 @@ export default function MyNFT() {
           ref.current.value = myAddress!;
         }
       }
-    }
+    };
     fillAddress();
   }, [signer]);
 
@@ -61,9 +76,11 @@ export default function MyNFT() {
       await myERC721Contract?.safeMint(account, 'https://example.com/nft.json');
       // 成功した場合はアラートを表示する
       setShowAlert(true);
-      setAlertMessage(`NFT minted and sent to the wallet ${account?.slice(0, 6) + '...' + account?.slice(-2)}. Enjoy your NFT!`)
+      setAlertMessage(
+        `NFT minted and sent to the wallet ${account?.slice(0, 6) + '...' + account?.slice(-2)}. Enjoy your NFT!`
+      );
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -84,7 +101,7 @@ export default function MyNFT() {
         try {
           balance = await myERC721Contract.balanceOf(myAddress);
         } catch (err) {
-          if (isError(err, "BAD_DATA")) {
+          if (isError(err, 'BAD_DATA')) {
             // balanceOfにおいて、対応アドレスの保有NFTが0のときは、BAD_DATAエラーが発生するためハンドリング
             balance = BigInt(0);
           } else {
@@ -103,8 +120,8 @@ export default function MyNFT() {
           const jsonMetaData = {
             name: 'NFT #${tokenId}',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            image: 'https://source.unsplash.com/300x200?glass&s=${tokenId}'
-          }
+            image: 'https://source.unsplash.com/300x200?glass&s=${tokenId}',
+          };
           nfts.push({ tokenId, ...jsonMetaData });
         }
         setMyNFTs(nfts);
@@ -133,8 +150,8 @@ export default function MyNFT() {
         // ローカルにデプロイしたSeaport Contractのアドレスを指定
         const localSeaport = new Seaport(ethersV5Signer, {
           overrides: {
-            contractAddress: seaportAddress
-          }
+            contractAddress: seaportAddress,
+          },
         });
         setSeaport(localSeaport);
       }
@@ -149,7 +166,7 @@ export default function MyNFT() {
   // NFT作成中のローディング
   const [loadingSellOrder, setLoadingSellOrder] = useState(false);
   // 売りに出すNFTのtokenIdを保持
-  const [ sellTargetTokenId, setSellTargetTokenId ] = useState<string | null>(null);
+  const [sellTargetTokenId, setSellTargetTokenId] = useState<string | null>(null);
 
   // モーダルのオープン
   const openModal = (tokenId: string) => {
@@ -170,22 +187,20 @@ export default function MyNFT() {
             itemType: ItemType.ERC721,
             token: contractAddress,
             identifier: sellTargetTokenId,
-          }
+          },
         ], // 上記はMyERC721を売りに出していることを示している
         consideration: [
           {
             amount: ethers.parseUnits(price, 'ether').toString(),
             recipient: await signer?.getAddress()!,
             token: ethers.ZeroAddress,
-          }
+          },
           // 上記は売りに出したNFTの売価と受取人を指定している
         ],
         // 下記のように手数料やロイヤリティを指定することもできる
         // fees: [{ recipient: signer._address, basisPoints: 500 }]
       } as CreateOrderInput;
-      const orderUseCase = await seaport!.createOrder(
-        firstStandardCreateOrderInput
-      );
+      const orderUseCase = await seaport!.createOrder(firstStandardCreateOrderInput);
       // executeAllActionsの返り値で返却されるorderは、NFT売却者(offerer)が署名した売り注文データとなっている
       const order = await orderUseCase.executeAllActions();
       console.log(order); // For Debug
@@ -195,7 +210,7 @@ export default function MyNFT() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(order)
+        body: JSON.stringify(order),
       });
       // 注文が成功したら、アラートを表示
       setShowAlert(true);
@@ -205,71 +220,80 @@ export default function MyNFT() {
       setSellTargetTokenId(null);
       close();
     }
-  }
+  };
 
   return (
     <div>
-      <Title order={1} style={{ paddingBottom: 12 }}>My NFT Management</Title>
-      { /* アラート表示 */}
-      {
-        showAlert ?
+      <Title order={1} style={{ paddingBottom: 12 }}>
+        My NFT Management
+      </Title>
+      {/* アラート表示 */}
+      {showAlert ? (
         <Container py={8}>
-        <Alert
-          variant='light'
-          color='teal'
-          title='NFT Minted Successfully!'
-          withCloseButton
-          onClose={() => setShowAlert(false)}
-          icon={<IconCubePlus />}>
-          </Alert>
-          </Container> : null
-      }
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 5}}>
-        { /* NFT作成フォーム */}
-        <Card shadow='sm' padding='lg' radius='md' withBorder>
+          <Alert
+            variant="light"
+            color="teal"
+            title="NFT Minted Successfully!"
+            withCloseButton
+            onClose={() => setShowAlert(false)}
+            icon={<IconCubePlus />}
+          ></Alert>
+        </Container>
+      ) : null}
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }}>
+        {/* NFT作成フォーム */}
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section>
             <Container py={12}>
-              <Group justify='center'>
-                <Avatar color='blue' radius='xl'>
-                  <IconCubePlus size='1.5rem' />
+              <Group justify="center">
+                <Avatar color="blue" radius="xl">
+                  <IconCubePlus size="1.5rem" />
                 </Avatar>
                 <Text fw={700}>Mint Your NFTs !</Text>
               </Group>
             </Container>
           </Card.Section>
           <Stack>
-            <TextInput
-              ref={ref}
-              label='Wallet address'
-              placeholder='0x...' />
-            <Button loading={loading} onClick={handleButtonClick}>Mint NFT</Button>
+            <TextInput ref={ref} label="Wallet address" placeholder="0x..." />
+            <Button loading={loading} onClick={handleButtonClick}>
+              Mint NFT
+            </Button>
           </Stack>
         </Card>
         {/* NFT一覧 */}
-        {
-          myNFTs.map((nft, index) => (
-            <Card key={index} shadow='sm' padding='lg' radius='md' withBorder>
-              <Card.Section>
-                <Image src={nft.image} height={160} alt="No image" />
-              </Card.Section>
-              <Group justify='space-between' mt='md' mb='xs'>
-                <Text fw={500}>{nft.name}</Text>
-                <Badge color='blue' variant='light'>
-                  tokenId: {nft.tokenId.toString()}
-                </Badge>
-              </Group>
-              <Text size='sm' c='dimmed'>{nft.description}</Text>
-              <Button variant='light' color='blue' fullWidth mt='md' radius='md' onClick={() => openModal(nft.tokenId.toString())}>
-                Sell NFT
-              </Button>
-            </Card>
-          ))
-        }
+        {myNFTs.map((nft, index) => (
+          <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
+            <Card.Section>
+              <Image src={nft.image} height={160} alt="No image" />
+            </Card.Section>
+            <Group justify="space-between" mt="md" mb="xs">
+              <Text fw={500}>{nft.name}</Text>
+              <Badge color="blue" variant="light">
+                tokenId: {nft.tokenId.toString()}
+              </Badge>
+            </Group>
+            <Text size="sm" c="dimmed">
+              {nft.description}
+            </Text>
+            <Button
+              variant="light"
+              color="blue"
+              fullWidth
+              mt="md"
+              radius="md"
+              onClick={() => openModal(nft.tokenId.toString())}
+            >
+              Sell NFT
+            </Button>
+          </Card>
+        ))}
       </SimpleGrid>
       <Modal opened={opened} onClose={close} title="Sell your NFT">
         <Stack>
-          <TextInput ref={refSellOrder} label='Price (ether)' placeholder='10' />
-          <Button loading={loadingSellOrder} onClick={createSellOrder}>Create Sell Order</Button>
+          <TextInput ref={refSellOrder} label="Price (ether)" placeholder="10" />
+          <Button loading={loadingSellOrder} onClick={createSellOrder}>
+            Create Sell Order
+          </Button>
         </Stack>
       </Modal>
     </div>

@@ -6,15 +6,15 @@ const orderDatas: Array<OrderWithCounter> = [];
 
 // 売り注文 (seaport-jsのsell order) を登録・公開するPOST API
 export async function POST(request: Request) {
-  const data = await request.json() as OrderWithCounter;
+  const data = (await request.json()) as OrderWithCounter;
   orderDatas.push(data);
   return NextResponse.json({ message: 'SUCCESS' });
-};
+}
 
 // 公開売り注文 (sell order) の一覧を取得するGET API
 export async function GET() {
   return NextResponse.json(orderDatas);
-};
+}
 
 // 登録された売り注文 (sell order) を削除するDELETE API
 export async function DELETE(request: Request) {
@@ -29,4 +29,4 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ message: 'ERROR Not Found' }, { status: 404 });
   }
   return NextResponse.json({ message: 'SUCCESS' });
-};
+}
